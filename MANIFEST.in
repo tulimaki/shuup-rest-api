@@ -1,0 +1,6 @@
+include README.md
+
+recursive-include shuup_rest_api/locale *.mo
+recursive-include shuup_rest_api/templates *.jinja *.txt
+recursive-include shuup_rest_api/static *.*
+recursive-exclude shuup_rest_api/static *.map

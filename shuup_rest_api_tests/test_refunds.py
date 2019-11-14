@@ -20,7 +20,7 @@ from shuup.testing.factories import (
     get_default_shop, get_default_supplier
 )
 from shuup.utils.money import Money
-from shuup_tests.simple_supplier.utils import get_simple_supplier
+from .utils import get_simple_supplier
 
 
 @pytest.mark.django_db

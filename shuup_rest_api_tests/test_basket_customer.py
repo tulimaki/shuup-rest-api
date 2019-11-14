@@ -14,25 +14,18 @@ import pytest
 import six
 from django.contrib.auth import get_user_model
 from django.test import override_settings
-from pytest_django.fixtures import django_user_model, django_username_field
 from rest_framework import status
 from rest_framework.test import APIClient
-
 from shuup import configuration
 from shuup.core import cache
 from shuup.core.models import (
-    Basket, get_person_contact, Order, OrderStatus, PaymentStatus, Product,
-    ProductMedia, ProductMediaKind, ShippingStatus, Shop, ShopProduct,
-    ShopProductVisibility, ShopStatus
+    Basket, get_person_contact, Order, OrderStatus, PaymentStatus,
+    ShippingStatus, Shop, ShopStatus
 )
 from shuup.core.pricing import TaxfulPrice
 from shuup.testing import factories
 from shuup.testing.factories import (
-    create_product, create_random_order, get_default_currency,
-    get_default_supplier, get_random_filer_image
-)
-from shuup_tests.campaigns.test_discount_codes import (
-    Coupon, get_default_campaign
+    create_product, create_random_order, get_default_supplier
 )
 
 User = get_user_model()

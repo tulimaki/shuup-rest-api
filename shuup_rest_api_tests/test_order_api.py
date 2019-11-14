@@ -5,8 +5,7 @@
 #
 # This source code is licensed under the OSL-3.0 license found in the
 # LICENSE file in the root directory of this source tree.
-from __future__ import unicode_literals
-
+from uuid import uuid4
 import datetime
 import decimal
 import json
@@ -26,7 +25,6 @@ from shuup.testing.factories import (
     get_default_shipping_method, get_default_shop, get_default_supplier,
     get_default_tax,
 )
-from shuup_tests.utils import printable_gibberish
 
 
 def setup_function(fn):
@@ -49,7 +47,7 @@ def test_get_by_id(admin_user):
 @pytest.mark.django_db
 def test_get_by_identifier(admin_user):
     shop = get_default_shop()
-    for i in range(1,10):
+    for i in range(1, 10):
         order = create_empty_order(shop=shop)
         order.save()
 
@@ -151,7 +149,7 @@ def test_create_order(admin_user, currency):
     contact.save()
 
     product = create_product(
-        sku=printable_gibberish(),
+        sku=uuid4().hex,
         supplier=get_default_supplier(),
         shop=shop
     )
@@ -253,17 +251,17 @@ def test_create_without_a_contact(admin_user):
     assert Order.objects.count() == 1
     order = Order.objects.first()
     assert order.shop == shop
-    assert order.customer == None
+    assert order.customer is None
     assert order.creator == admin_user
     assert order.shipping_method == sm
     assert order.payment_method == pm
-    assert order.billing_address == None
-    assert order.shipping_address == None
+    assert order.billing_address is None
+    assert order.shipping_address is None
     assert order.payment_status == PaymentStatus.NOT_PAID
     assert order.shipping_status == ShippingStatus.NOT_SHIPPED
     assert order.status == OrderStatus.objects.get_default_initial()
     assert order.taxful_total_price_value == decimal.Decimal(3.5)
-    assert order.lines.count() == 3 # shipping line, payment line, 2 product lines, 2 other lines
+    assert order.lines.count() == 3  # shipping line, payment line, 2 product lines, 2 other lines
     for idx, line in enumerate(order.lines.all()[:1]):
         assert line.quantity == decimal.Decimal(lines[idx].get("quantity"))
         assert line.base_unit_price_value == decimal.Decimal(lines[idx].get("base_unit_price_value", 0))
@@ -280,7 +278,7 @@ def test_order_create_without_default_address(admin_user):
     contact.default_shipping_address = None
     contact.save()
     product = create_product(
-        sku=printable_gibberish(),
+        sku=uuid4().hex,
         supplier=get_default_supplier(),
         shop=shop
     )
@@ -313,18 +311,19 @@ def test_order_create_without_default_address(admin_user):
     assert order.shipping_status == ShippingStatus.NOT_SHIPPED
     assert order.status == OrderStatus.objects.get_default_initial()
     assert order.taxful_total_price_value == decimal.Decimal(10)
-    assert order.lines.count() == 6 # shipping line, payment line, 2 product lines, 2 other lines
+    assert order.lines.count() == 6  # shipping line, payment line, 2 product lines, 2 other lines
     for idx, line in enumerate(order.lines.all()[:4]):
         assert line.quantity == decimal.Decimal(lines[idx].get("quantity"))
         assert line.base_unit_price_value == decimal.Decimal(lines[idx].get("base_unit_price_value", 0))
         assert line.discount_amount_value == decimal.Decimal(lines[idx].get("discount_amount_value", 0))
+
 
 def test_order_create_without_shipping_or_billing_method(admin_user):
     create_default_order_statuses()
     shop = get_default_shop()
     contact = create_random_person(locale="en_US", minimum_name_comp_len=5)
     product = create_product(
-        sku=printable_gibberish(),
+        sku=uuid4().hex,
         supplier=get_default_supplier(),
         shop=shop
     )
@@ -355,7 +354,7 @@ def test_order_create_without_shipping_or_billing_method(admin_user):
     assert order.shipping_status == ShippingStatus.NOT_SHIPPED
     assert order.status == OrderStatus.objects.get_default_initial()
     assert order.taxful_total_price_value == decimal.Decimal(10)
-    assert order.lines.count() == 4 # 2 product lines, 2 other lines
+    assert order.lines.count() == 4  # 2 product lines, 2 other lines
     for idx, line in enumerate(order.lines.all()[:4]):
         assert line.quantity == decimal.Decimal(lines[idx].get("quantity"))
         assert line.base_unit_price_value == decimal.Decimal(lines[idx].get("base_unit_price_value", 0))
@@ -375,7 +374,7 @@ def test_complete_order(admin_user):
 
 def test_cancel_order(admin_user):
     shop = get_default_shop()
-    supplier = get_default_supplier()
+    get_default_supplier()
     order = create_empty_order(shop=shop)
     order.save()
     client = _get_client(admin_user)

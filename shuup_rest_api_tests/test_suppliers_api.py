@@ -19,7 +19,7 @@ from shuup.testing.factories import (
     get_default_supplier
 )
 from shuup.core.suppliers.enums import StockAdjustmentType
-from shuup_tests.simple_supplier.utils import get_simple_supplier
+from .utils import get_simple_supplier
 from shuup.simple_supplier.models import StockAdjustment
 
 

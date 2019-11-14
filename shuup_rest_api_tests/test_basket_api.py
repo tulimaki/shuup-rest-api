@@ -19,7 +19,7 @@ from django.utils.timezone import now
 from pytest_django.fixtures import django_user_model, django_username_field
 from rest_framework import status
 from rest_framework.test import APIClient
-
+from shuup.campaigns.models import Coupon
 from shuup.core import cache
 from shuup.core.models import (
     Basket, Currency, get_person_contact, Order, OrderLineType,
@@ -33,13 +33,9 @@ from shuup.testing.factories import (
     get_default_supplier, get_default_tax, get_random_filer_image, get_tax
 )
 from shuup.utils.i18n import get_current_babel_locale
-from shuup_tests.campaigns.test_discount_codes import (
-    Coupon, get_default_campaign
-)
 
-from .basket_helpers import (
-    get_client, set_configuration
-)
+from .basket_helpers import get_client, set_configuration
+from .utils import get_default_campaign, get_simple_supplier
 
 
 def setup_function(fn):
@@ -54,6 +50,7 @@ def create_shop(name):
         public_name=name,
         currency=factories.get_default_currency().code
     )
+
 
 @pytest.mark.django_db
 def test_create_new_basket(admin_user):
@@ -179,7 +176,6 @@ def test_add_product_to_basket_with_summary(admin_user):
     tax = get_default_tax()
     tax2 = get_tax("simple-tax-2", "Simple tax 2", Decimal("0.25"))
     create_default_tax_rule(tax2)
-
 
     set_configuration()
     shop = factories.get_default_shop()
@@ -333,11 +329,10 @@ def test_add_product_shop_mismatch(admin_user):
 
 @pytest.mark.django_db
 def test_product_is_required_when_adding(admin_user):
-
     set_configuration()
     shop = factories.get_default_shop()
     basket = factories.get_basket()
-    shop_product = factories.get_default_shop_product()
+    factories.get_default_shop_product()
     client = get_client(admin_user)
     payload = {
         'shop': shop.id,
@@ -349,9 +344,7 @@ def test_product_is_required_when_adding(admin_user):
 
 @pytest.mark.django_db
 def test_quantity_has_to_be_in_stock(admin_user):
-
     set_configuration()
-    from shuup_tests.simple_supplier.utils import get_simple_supplier
     shop = factories.get_default_shop()
     basket = factories.get_basket()
 
@@ -496,7 +489,7 @@ def test_add_blank_code(admin_user):
     set_configuration()
     shop = factories.get_default_shop()
     basket = factories.get_basket()
-    shop_product = factories.get_default_shop_product()
+    factories.get_default_shop_product()
     client = get_client(admin_user)
     payload = {
         'code': ''

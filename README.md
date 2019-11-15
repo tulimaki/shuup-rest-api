@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/shuup/shuup-rest-api.svg?branch=master)](https://travis-ci.org/shuup/shuup-rest-api)
+
 # Shuup REST APIs
 
 `shuup_rest_api` adds several APIs endpoints to Shuup REST Framework

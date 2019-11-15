@@ -5,8 +5,11 @@ python:
   - "3.6"
 install:
   - pip install -U pip setuptools
+  - pip install codecov
   - pip install -r requirements-test.txt
 script:
   - flake8
   - isort --check-only
   - py.test --nomigrations shuup_rest_api_tests --cov shuup_rest_api/
+after_success:
+  - codecov

@@ -353,7 +353,7 @@ def test_quantity_has_to_be_in_stock(admin_user):
     quantity = 256
     supplier.adjust_stock(product.pk, quantity)
     shop_product = product.shop_products.first()
-    shop_product.suppliers = [supplier]
+    shop_product.suppliers.set([supplier])
 
     client = get_client(admin_user)
     payload = {
@@ -363,7 +363,7 @@ def test_quantity_has_to_be_in_stock(admin_user):
     }
     response = client.post('/api/shuup/basket/{}-{}/add/'.format(shop.pk, basket.key), payload)
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert '"Insufficient stock"' in str(response.content)
+    assert 'Insufficient quantity in stock' in str(response.content)
 
 
 @pytest.mark.django_db

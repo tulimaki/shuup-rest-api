@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 from parler_rest.fields import TranslatedFieldsField
 from parler_rest.serializers import TranslatableModelSerializer
 from rest_framework import filters, mixins, serializers, status, viewsets
-from rest_framework.decorators import detail_route, list_route
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from shuup.core.excs import ImpossibleProductModeException
 from shuup.core.models import (
@@ -259,9 +259,9 @@ class ProductStockStatusSerializer(serializers.Serializer):
 
 
 class ProductFilter(FilterSet):
-    product = django_filters.NumberFilter(name="pk", lookup_expr="exact")
-    sku = django_filters.CharFilter(name="sku", lookup_expr="exact")
-    supplier = django_filters.ModelChoiceFilter(name="shop_products__suppliers",
+    product = django_filters.NumberFilter(field_name="pk", lookup_expr="exact")
+    sku = django_filters.CharFilter(field_name="sku", lookup_expr="exact")
+    supplier = django_filters.ModelChoiceFilter(field_name="shop_products__suppliers",
                                                 queryset=Supplier.objects.enabled(),
                                                 lookup_expr="exact")
 
@@ -291,7 +291,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
     queryset = Product.objects.all_except_deleted()
     serializer_class = ProductSerializer
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
-    filter_class = ProductFilter
+    filterset_class = ProductFilter
 
     def get_view_name(self):
         return _("Products")
@@ -304,7 +304,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         instance.soft_delete(self.request.user)
 
     @schema_serializer_class(ShopProductSubsetSerializer)
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def add_shop(self, request, pk=None):
         """
         Adds a new shop to a product.
@@ -324,7 +324,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @schema_serializer_class(ProductMediaUploadSerializer)
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def add_media(self, request, pk=None):
         """
         Adds a media to a product.
@@ -341,7 +341,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @schema_serializer_class(ProductAttributeSerializer)
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def add_attribute(self, request, pk=None):
         """
         Adds an attribute value to a product.
@@ -362,7 +362,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @schema_serializer_class(ProductPackageChildSerializer)
-    @detail_route(methods=['post'])
+    @action(detail=True, methods=['post'])
     def make_package(self, request, pk=None):
         """
         Convert this product into a package of products.
@@ -384,7 +384,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @list_route(methods=['get'])
+    @action(detail=False, methods=['get'])
     def stocks(self, request):
         """
         Retrieves a list of products and their stocks.
@@ -397,7 +397,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         return Response(serializer.data)
 
     @schema_serializer_class(ProductSimpleVariationSerializer)
-    @detail_route(methods=['post', 'delete'])
+    @action(detail=True, methods=['post', 'delete'])
     def simple_variation(self, request, pk=None):
         """
         Add or remove simple variations of the product.
@@ -425,7 +425,7 @@ class ProductViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @schema_serializer_class(ProductLinkVariationVariableSerializer)
-    @detail_route(methods=['post', 'delete', 'put'])
+    @action(detail=True, methods=['post', 'delete', 'put'])
     def variable_variation(self, request, pk=None):
         """
         Add, update or remove variable variation of the product.

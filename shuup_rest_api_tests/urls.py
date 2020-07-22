@@ -9,5 +9,5 @@ from django.conf.urls import include, url
 
 urlpatterns = [
     url(r'^api/', include('shuup_api.urls')),
-    url(r'^', include('shuup.front.urls', namespace="shuup", app_name="shuup")),
+    url(r'^', include('shuup.front.urls', namespace="shuup")),
 ]

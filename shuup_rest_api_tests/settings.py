@@ -2,7 +2,10 @@
 from shuup_workbench.settings.utils import get_disabled_migrations
 from shuup_workbench.test_settings import *  # noqa
 
-INSTALLED_APPS = list(locals().get('INSTALLED_APPS', []))
+INSTALLED_APPS = list(locals().get('INSTALLED_APPS', [])) + [
+    "shuup_rest_api",
+    "rest_framework.authtoken"
+]
 
 DATABASES = {
     'default': {
@@ -20,18 +23,15 @@ MIGRATION_MODULES.update({
 ROOT_URLCONF = 'shuup_rest_api_tests.urls'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'shuup_api.authentication.ExpiringTokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'shuup_api.permissions.ShuupAPIPermission',
-    )
-}
-JWT_AUTH = {
-    'JWT_ALLOW_REFRESH': True
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination'
 }
 
 SHUUP_ENABLE_MULTIPLE_SHOPS = True
@@ -46,5 +46,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'shuup.xtheme.middleware.XthemeMiddleware',
 ]

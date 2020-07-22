@@ -17,7 +17,6 @@ from rest_framework.mixins import (
 )
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework_jwt.serializers import JSONWebTokenSerializer
 from shuup.core.models import (
     Gender, get_person_contact, MutableAddress, PersonContact
 )
@@ -119,7 +118,7 @@ class FrontUserViewSet(PermissionHelperMixin, CreateModelMixin, UpdateModelMixin
         return _("Users can register to the storefront and fetch and update their own user details.")
 
     def get_object(self):
-        if self.request.user.is_anonymous():
+        if self.request.user.is_anonymous:
             raise Http404
         return get_person_contact(self.request.user)
 
@@ -138,8 +137,22 @@ class FrontUserViewSet(PermissionHelperMixin, CreateModelMixin, UpdateModelMixin
         if serializer.is_valid():
             serializer.save()
             auth_classes = getattr(settings, "REST_FRAMEWORK", {}).get("DEFAULT_AUTHENTICATION_CLASSES", [])
+            if "shuup_api.authentication.ExpiringTokenAuthentication" in auth_classes:
+                from rest_framework.authtoken.serializers import AuthTokenSerializer
+                username_field = get_user_model().USERNAME_FIELD
+                username = serializer.data.get(username_field)
+                password = request.data.get("password")
+                token_data = {"password": password}
+                token_data[username_field] = username
+                token_serializer = AuthTokenSerializer(data=token_data)
+                if token_serializer.is_valid():
+                    from rest_framework.authtoken.models import Token
+                    token, created = Token.objects.get_or_create(user=token_serializer.validated_data['user'])
+                    return Response({"token": token.key}, status=status.HTTP_201_CREATED)
+
             # TODO: ultimately should have a configurable "preferred" auth method
             if "rest_framework_jwt.authentication.JSONWebTokenAuthentication" in auth_classes:
+                from rest_framework_jwt.serializers import JSONWebTokenSerializer
                 username_field = get_user_model().USERNAME_FIELD
                 username = serializer.data.get(username_field)
                 password = request.data.get("password")

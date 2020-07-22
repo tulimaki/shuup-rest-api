@@ -24,13 +24,13 @@ class CgpPriceSerializer(serializers.ModelSerializer):
 
 
 class CgpPriceFilter(FilterSet):
-    product = django_filters.ModelChoiceFilter(name="product",
+    product = django_filters.ModelChoiceFilter(field_name="product",
                                                queryset=Product.objects.all(),
                                                lookup_expr="exact")
-    shop = django_filters.ModelChoiceFilter(name="shop",
+    shop = django_filters.ModelChoiceFilter(field_name="shop",
                                             queryset=Shop.objects.all(),
                                             lookup_expr="exact")
-    group = django_filters.ModelChoiceFilter(name="group",
+    group = django_filters.ModelChoiceFilter(field_name="group",
                                              queryset=ContactGroup.objects.all(),
                                              lookup_expr="exact")
 
@@ -60,7 +60,7 @@ class CgpPriceViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewset
     queryset = CgpPrice.objects.all()
     serializer_class = CgpPriceSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = CgpPriceFilter
+    filterset_class = CgpPriceFilter
 
     def get_view_name(self):
         return _("Customer Group Price")

@@ -73,7 +73,7 @@ class ContactViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, ModelVie
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = ContactFilter
+    filterset_class = ContactFilter
 
     def get_view_name(self):
         return _("Contacts")
@@ -104,7 +104,7 @@ class PersonContactViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, Mo
     queryset = PersonContact.objects.all()
     serializer_class = PersonContactSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = ContactFilter
+    filterset_class = ContactFilter
 
     def get_view_name(self):
         return _("Person Contact")

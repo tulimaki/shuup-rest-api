@@ -39,10 +39,11 @@ def test_product_simple_variation(admin_user):
     product4 = create_product("product4", shop=shop2)  # this is from shop2
     assert product1.mode == product2.mode == product3.mode == product4.mode == ProductMode.NORMAL
 
-    variation_data = {"products":[product2.pk, product3.pk, product4.pk]}
+    variation_data = {"products": [product2.pk, product3.pk, product4.pk]}
     response = client.post("/api/shuup/product/%d/simple_variation/" % product1.pk,
                            content_type="application/json",
                            data=json.dumps(variation_data))
+    print(response)
     assert response.status_code == status.HTTP_201_CREATED
     product1.refresh_from_db()
     product2.refresh_from_db()

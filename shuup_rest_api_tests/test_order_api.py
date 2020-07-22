@@ -11,7 +11,7 @@ import decimal
 import json
 
 import pytest
-from django.utils.timezone import datetime as dt
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.test import APIClient
 
@@ -64,8 +64,8 @@ def test_get_by_identifier(admin_user):
 @pytest.mark.django_db
 def test_get_by_order_date(admin_user):
     shop = get_default_shop()
-    today = dt.today()
-    yesterday = dt.today() - datetime.timedelta(days=1)
+    today = now().today()
+    yesterday = now() - datetime.timedelta(days=1)
     for i in range(1, 10):
         order = create_empty_order(shop=shop)
         order.order_date = yesterday
@@ -82,7 +82,7 @@ def test_get_by_order_date(admin_user):
     assert order_data[0].get("id") == order.id
     assert order_data[0].get("identifier") == order.identifier
 
-    response = client.get("/api/shuup/order/", data={"date": yesterday})
+    response = client.get("/api/shuup/order/", data={"date": yesterday.strftime("%Y-%m-%d %H:%M:%S")})
     assert response.status_code == status.HTTP_200_OK
     order_data = json.loads(response.content.decode("utf-8"))
     assert len(order_data) == 9

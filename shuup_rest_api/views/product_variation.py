@@ -91,7 +91,7 @@ class ProductVariationVariableSerializer(TranslatableModelSerializer):
 
 
 class ProductVariationVariableFilter(FilterSet):
-    product = django_filters.ModelChoiceFilter(name="product",
+    product = django_filters.ModelChoiceFilter(field_name="product",
                                                queryset=Product.objects.all(),
                                                lookup_expr="exact")
 
@@ -101,10 +101,10 @@ class ProductVariationVariableFilter(FilterSet):
 
 
 class ProductVariationVariableValueFilter(FilterSet):
-    product = django_filters.ModelChoiceFilter(name="variable__product",
+    product = django_filters.ModelChoiceFilter(field_name="variable__product",
                                                queryset=Product.objects.all(),
                                                lookup_expr="exact")
-    variable = django_filters.ModelChoiceFilter(name="variable",
+    variable = django_filters.ModelChoiceFilter(field_name="variable",
                                                 queryset=ProductVariationVariable.objects.all(),
                                                 lookup_expr="exact")
 
@@ -134,7 +134,7 @@ class ProductVariationVariableViewSet(PermissionHelperMixin, viewsets.ModelViewS
     queryset = ProductVariationVariable.objects.all()
     serializer_class = ProductVariationVariableSerializer
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
-    filter_class = ProductVariationVariableFilter
+    filterset_class = ProductVariationVariableFilter
 
     def perform_destroy(self, instance):
         product = instance.product
@@ -171,7 +171,7 @@ class ProductVariationVariableValueViewSet(PermissionHelperMixin, viewsets.Model
     queryset = ProductVariationVariableValue.objects.all()
     serializer_class = ProductVariationVariableValueSerializer
     filter_backends = (filters.OrderingFilter, DjangoFilterBackend)
-    filter_class = ProductVariationVariableValueFilter
+    filterset_class = ProductVariationVariableValueFilter
 
     def get_view_name(self):
         return _("Product Variation Variable Value")

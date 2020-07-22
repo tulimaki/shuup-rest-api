@@ -5,10 +5,18 @@
 #
 # This source code is licensed under the OSL-3.0 license found in the
 # LICENSE file in the root directory of this source tree.
-# from django.conf import settings
-
+from shuup.testing.factories import get_default_shop
+from shuup.xtheme.testing import override_current_theme_class
 
 # ORIGINAL_SETTINGS = []
+
+
+def pytest_runtest_call(item):
+    # All tests are run with a theme override `shuup.themes.classic_gray.ClassicGrayTheme`.
+    # To un-override, use `with override_current_theme_class()` (no arguments to re-enable database lookup)
+    from shuup.themes.classic_gray.theme import ClassicGrayTheme
+    item.session._theme_overrider = override_current_theme_class(ClassicGrayTheme, get_default_shop())
+    item.session._theme_overrider.__enter__()
 
 
 # def pytest_runtest_setup(item):

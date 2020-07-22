@@ -27,8 +27,8 @@ def setup_function(fn):
 @pytest.mark.django_db
 def test_get_shipments(admin_user):
     client = _get_client(admin_user)
-    shop1 = get_shop(True)
-    shop2 = get_shop(True)
+    shop1 = get_shop(True, name="teststore 1")
+    shop2 = get_shop(True, name="teststore 2")
     customer1 = create_random_person()
     customer2 = create_random_person()
     order1 = create_random_order(customer1, shop=shop1, completion_probability=1)
@@ -54,14 +54,12 @@ def test_get_shipments(admin_user):
     assert shipment_data["order"] == order1.pk
 
     # get shipment by product
-    product = order2.shipments.first().products.first()
+    product = order2.shipments.first().products.first().product
     response = client.get("/api/shuup/shipment/?product=%s" % product.pk)
     assert response.status_code == status.HTTP_200_OK
     shipment_data = json.loads(response.content.decode("utf-8"))
     for ship in shipment_data:
-        for ship_product in shipment_data["product"]:
-            assert ship_product["id"] == product.pk
-            assert ship_product["order"] == order2.pk
+        assert ship["products"][0]["product"] == product.pk
 
     # get shipment by order
     response = client.get("/api/shuup/shipment/?order=%s" % order3.pk)

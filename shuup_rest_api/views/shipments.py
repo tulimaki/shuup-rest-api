@@ -30,12 +30,10 @@ class ShipmentSerializar(serializers.ModelSerializer):
 
 
 class ShipmentFilter(FilterSet):
-    product = django_filters.ModelChoiceFilter(name="products__product",
-                                               queryset=Product.objects.all(),
-                                               lookup_expr="exact")
-    shop = django_filters.ModelChoiceFilter(name="order__shop",
-                                            queryset=Shop.objects.all(),
-                                            lookup_expr="exact")
+    product = django_filters.ModelChoiceFilter(
+        field_name="products__product", queryset=Product.objects.all(), lookup_expr="exact")
+    shop = django_filters.ModelChoiceFilter(
+        field_name="order__shop", queryset=Shop.objects.all(), lookup_expr="exact")
 
     class Meta:
         model = Shipment
@@ -53,7 +51,7 @@ class ShipmentViewSet(PermissionHelperMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Shipment.objects.all()
     serializer_class = ShipmentSerializar
     filter_backends = (DjangoFilterBackend,)
-    filter_class = ShipmentFilter
+    filterset_class = ShipmentFilter
 
     def get_view_name(self):
         return _("Shipments")

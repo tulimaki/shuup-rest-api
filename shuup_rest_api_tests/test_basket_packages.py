@@ -121,7 +121,7 @@ def test_basket_with_package_product(admin_user):
         "product": sand_bag_25kg_product.id
     })
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert "Insufficient stock" in response.data["error"]
+    assert "Insufficient quantity" in response.data["error"]
 
     # create order anyway
     response = client.post("/api/shuup/basket/{}/create_order/".format(basket_uuid), format="json")

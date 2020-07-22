@@ -80,8 +80,8 @@ class OrderShopSerializer(serializers.ModelSerializer):
 
 class OrderLineSerializer(BaseLineSerializerMixin, TaxLineSerializerMixin, serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
-    gross_weight = serializers.ReadOnlyField(source="product.gross_weight")
-    net_weight = serializers.ReadOnlyField(source="product.net_weight")
+    gross_weight = serializers.ReadOnlyField(source="product.gross_weight", default=0)
+    net_weight = serializers.ReadOnlyField(source="product.net_weight", default=0)
 
     class Meta:
         model = OrderLine
@@ -176,7 +176,7 @@ class FrontOrderViewSet(OrderTaxesMixin,
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = OrderFilter
+    filterset_class = OrderFilter
 
     def get_view_name(self):
         return _("Front Orders")

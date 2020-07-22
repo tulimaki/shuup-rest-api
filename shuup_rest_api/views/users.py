@@ -50,7 +50,7 @@ class UserViewSet(PermissionHelperMixin, ModelViewSet):
     queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = UserFilter
+    filterset_class = UserFilter
 
     def get_view_name(self):
         return _("Users")

@@ -71,8 +71,8 @@ class ShopSerializer(TranslatableModelSerializer):
 
 
 class ShopFilter(FilterSet):
-    modified_before = django_filters.IsoDateTimeFilter(name="modified_on", lookup_expr='lt')
-    modified_after = django_filters.IsoDateTimeFilter(name="modified_on", lookup_expr='gt')
+    modified_before = django_filters.IsoDateTimeFilter(field_name="modified_on", lookup_expr='lt')
+    modified_after = django_filters.IsoDateTimeFilter(field_name="modified_on", lookup_expr='gt')
 
     class Meta:
         model = Shop
@@ -170,7 +170,7 @@ class ShopViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewsets.Mo
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
     filter_backends = (DjangoFilterBackend, filters.OrderingFilter, NearbyShopsFilter)
-    filter_class = ShopFilter
+    filterset_class = ShopFilter
     ordering_fields = ('modified_on',)
 
     def get_queryset(self):

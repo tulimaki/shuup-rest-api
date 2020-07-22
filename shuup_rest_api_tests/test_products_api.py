@@ -236,7 +236,7 @@ def test_create_product_with_shop_product_and_attributes(admin_user):
         "numeric_value": 12,
         "boolean_value": True,
         "timedelta_value": "200",  # seconds
-        "datetime_value": "2017-01-01 01:00:00",
+        "datetime_value": "2017-01-01 01:00Z",
         "translated_string_value": "translated string value"
     }
 
@@ -313,7 +313,7 @@ def test_create_product_with_shop_product_and_attributes(admin_user):
                 assert attr.value == expected_values["numeric_value"]
         elif attribute.is_temporal:
             dt_value = expected_values["datetime_value"]
-            parsed_dt = dt.strptime(dt_value, "%Y-%m-%d %H:%M:%S")
+            parsed_dt = dt.strptime(dt_value, "%Y-%m-%d %H:%M%z")
             assert attr.value.year == parsed_dt.year
             assert attr.value.month == parsed_dt.month
             assert attr.value.day == parsed_dt.day

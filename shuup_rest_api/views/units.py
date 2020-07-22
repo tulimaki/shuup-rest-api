@@ -16,12 +16,12 @@ from shuup_api.mixins import PermissionHelperMixin, ProtectedModelViewSetMixin
 
 class _ShortNameAliased(object):
     def run_validation(self, initial_data):
-        initial_data.setdefault('symbol', initial_data.pop('short_name', None))
+        initial_data.setdefault('symbol', initial_data.pop('symbol', None))
         return super(_ShortNameAliased, self).run_validation(initial_data)
 
     def to_representation(self, instance):
         data = super(_ShortNameAliased, self).to_representation(instance)
-        data['short_name'] = data.get('symbol')
+        data['symbol'] = data.get('symbol')
         return data
 
 

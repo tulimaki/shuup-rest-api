@@ -60,10 +60,10 @@ class CategorySerializer(TranslatableModelSerializer):
 
 class CategoryFilter(FilterSet):
     parent = django_filters.ModelChoiceFilter(
-        name="parent", queryset=Category.objects.all(), lookup_expr="exact")
+        field_name="parent", queryset=Category.objects.all(), lookup_expr="exact")
     shop = django_filters.ModelChoiceFilter(
-        name="shops", queryset=Shop.objects.all(), lookup_expr="exact")
-    status = django_filters.ChoiceFilter(name="status", choices=CategoryStatus.choices, lookup_expr="exact")
+        field_name="shops", queryset=Shop.objects.all(), lookup_expr="exact")
+    status = django_filters.ChoiceFilter(field_name="status", choices=CategoryStatus.choices, lookup_expr="exact")
 
     class Meta:
         model = Category
@@ -91,7 +91,7 @@ class CategoryViewSet(ProtectedModelViewSetMixin, PermissionHelperMixin, viewset
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = CategoryFilter
+    filterset_class = CategoryFilter
 
     def perform_destroy(self, instance):
         instance.soft_delete(user=self.request.user)

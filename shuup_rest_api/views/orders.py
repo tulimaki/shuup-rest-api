@@ -33,7 +33,10 @@ from shuup_rest_api.views.refunds import RefundMixin
 class OrderLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderLine
-        fields = ("product", "sku", "text", "quantity", "type", "base_unit_price_value", "discount_amount_value")
+        fields = (
+            "product", "sku", "text", "quantity", "supplier",
+            "type", "base_unit_price_value", "discount_amount_value"
+        )
 
     def get_fields(self):
         fields = super(OrderLineSerializer, self).get_fields()
@@ -178,7 +181,7 @@ class OrderViewSet(PermissionHelperMixin,
     def get_help_text(cls):
         return _("Orders can be listed, fetched, created, updated and canceled.")
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):     # noqa (C901)
         post_data = request.data
 
         # Revise. We should not need to mutate the data for the serializer.
@@ -209,19 +212,28 @@ class OrderViewSet(PermissionHelperMixin,
 
         shop = serializer.validated_data["shop"]
         customer = serializer.validated_data["customer"]
-        lines = [{
-            "id": (idx + 1),
-            "quantity": line["quantity"],
-            "product": {
-                "id": getattr(line["product"], "id", None)
-            },
-            "baseUnitPrice": line.get("base_unit_price_value"),
-            "unitPrice": line.get("base_unit_price_value") if line["type"].label == "other" else None,
-            "discountAmount": line.get("discount_amount_value", 0),
-            "sku": line.get("sku"),
-            "text": line.get("text"),
-            "type": force_text(line["type"].label) if idx not in text_lines else "text"
-        } for idx, line in enumerate(serializer.validated_data["lines"])]
+        lines = []
+
+        for idx, line in enumerate(serializer.validated_data["lines"]):
+            line_data = {
+                "id": (idx + 1),
+                "quantity": line["quantity"],
+                "product": {
+                    "id": getattr(line["product"], "id", None)
+                },
+                "baseUnitPrice": line.get("base_unit_price_value"),
+                "unitPrice": line.get("base_unit_price_value") if line["type"].label == "other" else None,
+                "discountAmount": line.get("discount_amount_value", 0),
+                "sku": line.get("sku"),
+                "text": line.get("text"),
+                "type": force_text(line["type"].label) if idx not in text_lines else "text"
+            }
+            if line.get("supplier"):
+                line_data["supplier"] = {
+                    "id": line["supplier"].pk
+                }
+
+            lines.append(line_data)
 
         data = {
             "shop": {

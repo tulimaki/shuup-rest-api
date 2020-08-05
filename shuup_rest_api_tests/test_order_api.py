@@ -139,6 +139,7 @@ def test_create_order(admin_user, currency):
     tax = get_default_tax()
     Currency.objects.get_or_create(code=currency, decimal_places=2)
     shop.save()
+    supplier = get_default_supplier()
     sm = get_default_shipping_method()
     pm = get_default_payment_method()
     contact = create_random_person(locale="en_US", minimum_name_comp_len=5)
@@ -156,8 +157,21 @@ def test_create_order(admin_user, currency):
     assert not Order.objects.count()
     client = _get_client(admin_user)
     lines = [
-        {"type": "product", "product": product.id, "quantity": "1", "base_unit_price_value": "5.00"},
-        {"type": "product", "product": product.id, "quantity": "2", "base_unit_price_value": "1.00", "discount_amount_value": "0.50"},
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "1",
+            "base_unit_price_value": "5.00"
+        },
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "2",
+            "base_unit_price_value": "1.00",
+            "discount_amount_value": "0.50"
+        },
         {"type": "other", "sku": "hello", "text": "A greeting", "quantity": 1, "base_unit_price_value": "3.5"},
         {"type": "text", "text": "This was an order!", "quantity": 0},
     ]
@@ -182,7 +196,7 @@ def test_create_order(admin_user, currency):
     assert order.shipping_status == ShippingStatus.NOT_SHIPPED
     assert order.status == OrderStatus.objects.get_default_initial()
     assert order.taxful_total_price_value == decimal.Decimal(10)
-    assert order.lines.count() == 6 # shipping line, payment line, 2 product lines, 2 other lines
+    assert order.lines.count() == 6     # shipping line, payment line, 2 product lines, 2 other lines
     assert order.currency == currency
     for idx, line in enumerate(order.lines.all()[:4]):
         assert line.quantity == decimal.Decimal(lines[idx].get("quantity"))
@@ -273,6 +287,7 @@ def test_order_create_without_default_address(admin_user):
     shop = get_default_shop()
     sm = get_default_shipping_method()
     pm = get_default_payment_method()
+    supplier = get_default_supplier()
     contact = create_random_person(locale="en_US", minimum_name_comp_len=5)
     contact.default_billing_address = None
     contact.default_shipping_address = None
@@ -285,8 +300,21 @@ def test_order_create_without_default_address(admin_user):
     assert not Order.objects.count()
     client = _get_client(admin_user)
     lines = [
-        {"type": "product", "product": product.id, "quantity": "1", "base_unit_price_value": "5.00"},
-        {"type": "product", "product": product.id, "quantity": "2", "base_unit_price_value": "1.00", "discount_amount_value": "0.50"},
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "1",
+            "base_unit_price_value": "5.00"
+        },
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "2",
+            "base_unit_price_value": "1.00",
+            "discount_amount_value": "0.50"
+        },
         {"type": "other", "sku": "hello", "text": "A greeting", "quantity": 1, "base_unit_price_value": "3.5"},
         {"type": "text", "text": "This was an order!", "quantity": 0},
     ]
@@ -321,6 +349,7 @@ def test_order_create_without_default_address(admin_user):
 def test_order_create_without_shipping_or_billing_method(admin_user):
     create_default_order_statuses()
     shop = get_default_shop()
+    supplier = get_default_supplier()
     contact = create_random_person(locale="en_US", minimum_name_comp_len=5)
     product = create_product(
         sku=uuid4().hex,
@@ -330,8 +359,21 @@ def test_order_create_without_shipping_or_billing_method(admin_user):
     assert not Order.objects.count()
     client = _get_client(admin_user)
     lines = [
-        {"type": "product", "product": product.id, "quantity": "1", "base_unit_price_value": "5.00"},
-        {"type": "product", "product": product.id, "quantity": "2", "base_unit_price_value": "1.00", "discount_amount_value": "0.50"},
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "1",
+            "base_unit_price_value": "5.00"
+        },
+        {
+            "type": "product",
+            "product": product.id,
+            "supplier": supplier.id,
+            "quantity": "2",
+            "base_unit_price_value": "1.00",
+            "discount_amount_value": "0.50"
+        },
         {"type": "other", "sku": "hello", "text": "A greeting", "quantity": 1, "base_unit_price_value": "3.5"},
         {"type": "text", "text": "This was an order!", "quantity": 0},
     ]

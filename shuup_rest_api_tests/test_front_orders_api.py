@@ -41,8 +41,8 @@ def test_list_no_orders(admin_user):
 def test_list_orders(admin_user):
     shop = get_default_shop()
     product = create_product("test", shop, get_default_supplier())
-    order = create_random_order(get_person_contact(admin_user), [product])
-    order2 = create_random_order(create_random_person(), [product])
+    create_random_order(get_person_contact(admin_user), [product])
+    create_random_order(create_random_person(), [product])
     client = _get_client(admin_user)
     response = client.get("/api/shuup/front/orders/")
     response_data = json.loads(response.content.decode("utf-8"))
@@ -73,10 +73,12 @@ def test_retrieve_order(admin_user):
 
     order.refresh_from_db()
     taxful_total_of_products = sum([line.price.value for line in order.lines.filter(type=OrderLineType.PRODUCT)])
-    taxless_total_of_products = sum([line.taxless_price.value for line in order.lines.filter(type=OrderLineType.PRODUCT)])
+    taxless_total_of_products = sum(
+        [line.taxless_price.value for line in order.lines.filter(type=OrderLineType.PRODUCT)])
     assert Decimal(response_data["taxful_total_price"]) == Decimal(order.taxful_total_price)
     assert Decimal(response_data["total_price_of_products"]) == Decimal(taxful_total_of_products)
-    assert Decimal(response_data["taxful_total_price_of_products"]) == Decimal(taxful_total_of_products)  # prices include tax
+    # prices include tax
+    assert Decimal(response_data["taxful_total_price_of_products"]) == Decimal(taxful_total_of_products)
     assert Decimal(response_data["taxless_total_price_of_products"]) == Decimal(taxless_total_of_products)
     assert Decimal(response_data["taxful_total_discount"]) == Decimal(0)
 
@@ -112,7 +114,8 @@ def test_retrieve_order(admin_user):
     assert Decimal(response_data["total_price_of_products"]) == Decimal(total_of_products)
     assert Decimal(response_data["taxful_total_discount"]) == Decimal(2)
 
-    assert Decimal(sum_order_lines_price(order, "price", lambda line: line.type == OrderLineType.SHIPPING)) == Decimal(5)
+    assert Decimal(sum_order_lines_price(
+        order, "price", lambda line: line.type == OrderLineType.SHIPPING)) == Decimal(5)
 
     response = client.get("/api/shuup/front/orders/{}/".format(100))
     assert response.status_code == 404

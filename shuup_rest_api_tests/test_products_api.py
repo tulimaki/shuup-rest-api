@@ -6,7 +6,7 @@
 # This source code is licensed under the OSL-3.0 license found in the
 # LICENSE file in the root directory of this source tree.
 from __future__ import unicode_literals
-
+from django.utils.dateparse import parse_datetime
 import base64
 import datetime
 import json
@@ -313,7 +313,7 @@ def test_create_product_with_shop_product_and_attributes(admin_user):
                 assert attr.value == expected_values["numeric_value"]
         elif attribute.is_temporal:
             dt_value = expected_values["datetime_value"]
-            parsed_dt = dt.strptime(dt_value, "%Y-%m-%d %H:%M%z")
+            parsed_dt = parse_datetime(dt_value)
             assert attr.value.year == parsed_dt.year
             assert attr.value.month == parsed_dt.month
             assert attr.value.day == parsed_dt.day
